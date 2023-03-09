@@ -35,6 +35,7 @@ constexpr int MAX_ASK_NEAREST_TICK = MAXIMUM_ASK / TICK_SIZE_IN_CENTS * TICK_SIZ
 
 AutoTrader::AutoTrader(boost::asio::io_context& context) : BaseAutoTrader(context)
 {
+    
 }
 
 void AutoTrader::DisconnectHandler()
