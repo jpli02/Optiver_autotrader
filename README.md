@@ -37,8 +37,8 @@ of tools version 3.17 or higher. Ready Trader Go requires the free
 To compile an autotrader:
 
 ```shell
-cmake -DCMAKE_BUILD_TYPE=Debug -B build
-cmake --build build --config Debug
+cmake -DCMAKE_BUILD_TYPE=Release -B build
+cmake --build build --config Release
 ```
 
 Replace "Debug" with "Release" in the above to build with CMake's
