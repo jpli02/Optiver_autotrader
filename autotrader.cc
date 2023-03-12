@@ -28,7 +28,7 @@ using namespace ReadyTraderGo;
 RTG_INLINE_GLOBAL_LOGGER_WITH_CHANNEL(LG_AT, "AUTO")
 
 constexpr int LOT_SIZE = 10;
-constexpr int POSITION_LIMIT = 100;
+constexpr int POSITION_LIMIT = 200;
 constexpr int TICK_SIZE_IN_CENTS = 100;
 constexpr int MIN_BID_NEARST_TICK = (MINIMUM_BID + TICK_SIZE_IN_CENTS) / TICK_SIZE_IN_CENTS * TICK_SIZE_IN_CENTS;
 constexpr int MAX_ASK_NEAREST_TICK = MAXIMUM_ASK / TICK_SIZE_IN_CENTS * TICK_SIZE_IN_CENTS;
@@ -74,36 +74,62 @@ void AutoTrader::OrderBookMessageHandler(Instrument instrument,
                                    << "; bid prices: " << bidPrices[0]
                                    << "; bid volumes: " << bidVolumes[0];
 
-    if (instrument == Instrument::FUTURE)
-    {
-        unsigned long priceAdjustment = - (mPosition / LOT_SIZE) * TICK_SIZE_IN_CENTS;
-        unsigned long newAskPrice = (askPrices[0] != 0) ? askPrices[0] + priceAdjustment : 0;
-        unsigned long newBidPrice = (bidPrices[0] != 0) ? bidPrices[0] + priceAdjustment : 0;
 
+    if (instrument == Instrument::ETF)
+    {
+        ETFaskPrices = askPrices;
+        ETFaskVolumes = askVolumes;
+        ETFbidPrices = bidPrices;
+        ETFbidVolumes = bidVolumes;
+        
+
+    }
+
+
+    else if (instrument == Instrument::FUTURE)
+    {
+        FaskPrices = askPrices;
+        FaskVolumes = askVolumes;
+        FbidPrices = bidPrices;
+        FbidVolumes = bidVolumes;
+        // unsigned long priceAdjustment = - (mPosition / LOT_SIZE) * TICK_SIZE_IN_CENTS;
+        // unsigned long newAskPrice = (askPrices[0] != 0) ? askPrices[0] + priceAdjustment : 0;
+        // unsigned long newBidPrice = (bidPrices[0] != 0) ? bidPrices[0] + priceAdjustment : 0;
+        if (ETFbidPrices[0] == 0) return;
+        unsigned long newAskPrice = (ETFaskPrices[0] > bidPrices[0]) ? ETFaskPrices[0] : 0;
+        unsigned long newBidPrice = (ETFbidPrices[0] < askPrices[0]) ? ETFbidPrices[0] : 0;
+
+        // if find better, cancel previous one
         if (mAskId != 0 && newAskPrice != 0 && newAskPrice != mAskPrice)
         {
             SendCancelOrder(mAskId);
             mAskId = 0;
         }
+
+        // if find better, cancel previous one
         if (mBidId != 0 && newBidPrice != 0 && newBidPrice != mBidPrice)
         {
             SendCancelOrder(mBidId);
             mBidId = 0;
         }
 
-        if (mAskId == 0 && newAskPrice != 0 && mPosition > -POSITION_LIMIT && newAskPrice > bidPrices[0])
+           
+        if (mAskId == 0 && newAskPrice != 0 && FPosition > -POSITION_LIMIT) //&& newAskPrice > bidPrices[0]
         {
             mAskId = mNextMessageId++;
             mAskPrice = newAskPrice;
             SendInsertOrder(mAskId, Side::SELL, newAskPrice, LOT_SIZE, Lifespan::GOOD_FOR_DAY);
             mAsks.emplace(mAskId);
+            FPosition -= LOT_SIZE;
         }
-        if (mBidId == 0 && newBidPrice != 0 && mPosition < POSITION_LIMIT  && newBidPrice  < askPrices[0])
+        if (mBidId == 0 && newBidPrice != 0 && FPosition < POSITION_LIMIT) //&& newBidPrice  < askPrices[0]
         {
             mBidId = mNextMessageId++;
             mBidPrice = newBidPrice;
             SendInsertOrder(mBidId, Side::BUY, newBidPrice, LOT_SIZE, Lifespan::GOOD_FOR_DAY);
             mBids.emplace(mBidId);
+            FPosition += LOT_SIZE;
+            
         }
     }
 }
@@ -116,12 +142,12 @@ void AutoTrader::OrderFilledMessageHandler(unsigned long clientOrderId,
                                    << " lots at $" << price << " cents";
     if (mAsks.count(clientOrderId) == 1)
     {
-        mPosition -= (long)volume;
+        ETFPosition -= (long)volume;
         SendHedgeOrder(mNextMessageId++, Side::BUY, MAX_ASK_NEAREST_TICK, volume);
     }
     else if (mBids.count(clientOrderId) == 1)
     {
-        mPosition += (long)volume;
+        ETFPosition += (long)volume;
         SendHedgeOrder(mNextMessageId++, Side::SELL, MIN_BID_NEARST_TICK, volume);
     }
 }

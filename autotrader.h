@@ -99,9 +99,24 @@ private:
     unsigned long mAskPrice = 0;
     unsigned long mBidId = 0;
     unsigned long mBidPrice = 0;
-    signed long mPosition = 0;
+    
     std::unordered_set<unsigned long> mAsks;
     std::unordered_set<unsigned long> mBids;
+
+    signed long ETFPosition = 0;
+    signed long FPosition = 0;
+
+    // save ETF order book
+    std::array<unsigned long, 5> ETFaskPrices {};
+    std::array<unsigned long, 5> ETFaskVolumes {};
+    std::array<unsigned long, 5> ETFbidPrices {};
+    std::array<unsigned long, 5> ETFbidVolumes {};
+    
+    // save Future order book
+    std::array<unsigned long, 5> FaskPrices {};
+    std::array<unsigned long, 5> FaskVolumes {};
+    std::array<unsigned long, 5> FbidPrices {};
+    std::array<unsigned long, 5> FbidVolumes {};
 };
 
 #endif //CPPREADY_TRADER_GO_AUTOTRADER_H
