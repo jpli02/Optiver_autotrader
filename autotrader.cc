@@ -91,14 +91,14 @@ void AutoTrader::OrderBookMessageHandler(Instrument instrument,
             mBidId = 0;
         }
 
-        if (mAskId == 0 && newAskPrice != 0 && mPosition > -POSITION_LIMIT)
+        if (mAskId == 0 && newAskPrice != 0 && mPosition > -POSITION_LIMIT && newAskPrice > bidPrices[0])
         {
             mAskId = mNextMessageId++;
             mAskPrice = newAskPrice;
             SendInsertOrder(mAskId, Side::SELL, newAskPrice, LOT_SIZE, Lifespan::GOOD_FOR_DAY);
             mAsks.emplace(mAskId);
         }
-        if (mBidId == 0 && newBidPrice != 0 && mPosition < POSITION_LIMIT)
+        if (mBidId == 0 && newBidPrice != 0 && mPosition < POSITION_LIMIT  && newBidPrice  < askPrices[0])
         {
             mBidId = mNextMessageId++;
             mBidPrice = newBidPrice;

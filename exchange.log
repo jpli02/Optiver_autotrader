@@ -1,0 +1,75 @@
+2023-03-12 09:43:58,899 [INFO   ] [APP] exchange started with arguments={rtg.py, run, autotrader}
+2023-03-12 09:43:58,899 [INFO   ] [APP] configuration={"Engine":{"MarketDataFile":"data/market_data1.csv","MarketEventInterval":0.05,"MarketOpenDelay":5.0,"MatchEventsFile":"match_events.csv","ScoreBoardFile":"score_board.csv","Speed":1.0,"TickInterval":0.25},"Execution":{"Host":"127.0.0.1","Port":12345},"Fees":{"Maker":-0.0001,"Taker":0.0002},"Hud":{"Host":"127.0.0.1","Port":12347},"Information":{"Type":"mmap","Name":"info.dat"},"Instrument":{"EtfClamp":0.002,"TickSize":1.0},"Limits":{"ActiveOrderCountLimit":10,"ActiveVolumeLimit":200,"MessageFrequencyInterval":1.0,"MessageFrequencyLimit":50,"PositionLimit":100},"Traders":{"TraderOne":"secret","TraderTwo":"secret"}}
+2023-03-12 09:43:58,900 [INFO   ] [CONTROLLER] starting the match
+2023-03-12 09:43:58,900 [INFO   ] [EXECUTION] starting execution server: host=127.0.0.1 port=12345
+2023-03-12 09:43:58,900 [INFO   ] [INFORMATION] starting information publisher: type=mmap name=info.dat
+2023-03-12 09:43:58,923 [INFO   ] [HEADS_UP] starting heads-up display server: host=127.0.0.1 port=12347
+2023-03-12 09:43:58,923 [INFO   ] [INFORMATION] information channel established
+2023-03-12 09:43:59,394 [INFO   ] [CONNECTION] fd=26 connection established: peer=127.0.0.1:49708
+2023-03-12 09:43:59,394 [INFO   ] [EXECUTION] fd=26 'TraderOne' is ready!
+2023-03-12 09:44:00,584 [INFO   ] [CONNECTION] fd=27 connection established: peer=127.0.0.1:49709
+2023-03-12 09:44:03,936 [INFO   ] [CONTROLLER] market open
+2023-03-12 09:46:18,023 [INFO   ] [APP] SIGTERM signal received - shutting down...
+2023-03-12 09:46:18,023 [INFO   ] [APP] closing event loop
+2023-03-12 09:47:32,246 [INFO   ] [APP] exchange started with arguments={rtg.py, run, autotrader}
+2023-03-12 09:47:32,246 [INFO   ] [APP] configuration={"Engine":{"MarketDataFile":"data/market_data1.csv","MarketEventInterval":0.05,"MarketOpenDelay":5.0,"MatchEventsFile":"match_events.csv","ScoreBoardFile":"score_board.csv","Speed":1.0,"TickInterval":0.25},"Execution":{"Host":"127.0.0.1","Port":12345},"Fees":{"Maker":-0.0001,"Taker":0.0002},"Hud":{"Host":"127.0.0.1","Port":12347},"Information":{"Type":"mmap","Name":"info.dat"},"Instrument":{"EtfClamp":0.002,"TickSize":1.0},"Limits":{"ActiveOrderCountLimit":10,"ActiveVolumeLimit":200,"MessageFrequencyInterval":1.0,"MessageFrequencyLimit":50,"PositionLimit":100},"Traders":{"TraderOne":"secret","TraderTwo":"secret"}}
+2023-03-12 09:47:32,247 [INFO   ] [CONTROLLER] starting the match
+2023-03-12 09:47:32,247 [INFO   ] [EXECUTION] starting execution server: host=127.0.0.1 port=12345
+2023-03-12 09:47:32,247 [INFO   ] [INFORMATION] starting information publisher: type=mmap name=info.dat
+2023-03-12 09:47:32,271 [INFO   ] [HEADS_UP] starting heads-up display server: host=127.0.0.1 port=12347
+2023-03-12 09:47:32,271 [INFO   ] [INFORMATION] information channel established
+2023-03-12 09:47:32,567 [INFO   ] [CONNECTION] fd=26 connection established: peer=127.0.0.1:49776
+2023-03-12 09:47:32,568 [INFO   ] [EXECUTION] fd=26 'TraderOne' is ready!
+2023-03-12 09:47:33,849 [INFO   ] [CONNECTION] fd=27 connection established: peer=127.0.0.1:49777
+2023-03-12 09:47:37,280 [INFO   ] [CONTROLLER] market open
+2023-03-12 09:47:57,756 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=20.474666 client_order_id=102 message='order rejected: in cross with an existing order'
+2023-03-12 09:47:58,499 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=21.218587 client_order_id=110 message='order rejected: in cross with an existing order'
+2023-03-12 09:47:58,760 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=21.476301 client_order_id=111 message='order rejected: in cross with an existing order'
+2023-03-12 09:47:59,033 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=21.751481 client_order_id=112 message='order rejected: in cross with an existing order'
+2023-03-12 09:47:59,287 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=22.003407 client_order_id=113 message='order rejected: in cross with an existing order'
+2023-03-12 09:47:59,512 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=22.228928 client_order_id=114 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:00,516 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=83.236161 client_order_id=260 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:00,841 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=83.560286 client_order_id=261 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:02,077 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=84.797074 client_order_id=270 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:11,807 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=94.526479 client_order_id=320 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:12,524 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=95.243711 client_order_id=324 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:12,751 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=95.468723 client_order_id=325 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:13,831 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=96.550297 client_order_id=332 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:14,093 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=96.812296 client_order_id=333 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:16,584 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=99.303021 client_order_id=348 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:16,792 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=99.510859 client_order_id=349 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:17,004 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=99.723568 client_order_id=350 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:23,338 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=106.057687 client_order_id=372 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:28,032 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=110.751830 client_order_id=387 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:28,325 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=111.042559 client_order_id=388 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:28,532 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=111.246679 client_order_id=389 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:30,040 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=112.759650 client_order_id=392 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:30,250 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=112.969587 client_order_id=393 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:31,017 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=113.737048 client_order_id=397 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:31,271 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=113.987549 client_order_id=398 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:32,267 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=114.986406 client_order_id=404 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:49,500 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=132.219436 client_order_id=476 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:49,826 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=132.539552 client_order_id=477 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:50,046 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=132.766188 client_order_id=478 message='order rejected: in cross with an existing order'
+2023-03-12 09:49:54,097 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=136.816681 client_order_id=499 message='order rejected: in cross with an existing order'
+2023-03-12 09:50:02,547 [INFO   ] [COMPETITOR] 'TraderOne' sent error message: time=145.266327 client_order_id=541 message='order rejected: in cross with an existing order'
+2023-03-12 09:51:50,874 [INFO   ] [APP] SIGTERM signal received - shutting down...
+2023-03-12 09:51:50,875 [INFO   ] [APP] closing event loop
+2023-03-12 09:52:45,491 [INFO   ] [APP] exchange started with arguments={rtg.py, run, autotrader}
+2023-03-12 09:52:45,491 [INFO   ] [APP] configuration={"Engine":{"MarketDataFile":"data/market_data1.csv","MarketEventInterval":0.05,"MarketOpenDelay":5.0,"MatchEventsFile":"match_events.csv","ScoreBoardFile":"score_board.csv","Speed":1.0,"TickInterval":0.25},"Execution":{"Host":"127.0.0.1","Port":12345},"Fees":{"Maker":-0.0001,"Taker":0.0002},"Hud":{"Host":"127.0.0.1","Port":12347},"Information":{"Type":"mmap","Name":"info.dat"},"Instrument":{"EtfClamp":0.002,"TickSize":1.0},"Limits":{"ActiveOrderCountLimit":10,"ActiveVolumeLimit":200,"MessageFrequencyInterval":1.0,"MessageFrequencyLimit":50,"PositionLimit":100},"Traders":{"TraderOne":"secret","TraderTwo":"secret"}}
+2023-03-12 09:52:45,492 [INFO   ] [CONTROLLER] starting the match
+2023-03-12 09:52:45,492 [INFO   ] [EXECUTION] starting execution server: host=127.0.0.1 port=12345
+2023-03-12 09:52:45,492 [INFO   ] [INFORMATION] starting information publisher: type=mmap name=info.dat
+2023-03-12 09:52:45,514 [INFO   ] [HEADS_UP] starting heads-up display server: host=127.0.0.1 port=12347
+2023-03-12 09:52:45,514 [INFO   ] [INFORMATION] information channel established
+2023-03-12 09:52:45,940 [INFO   ] [CONNECTION] fd=26 connection established: peer=127.0.0.1:49877
+2023-03-12 09:52:45,940 [INFO   ] [EXECUTION] fd=26 'TraderOne' is ready!
+2023-03-12 09:52:47,275 [INFO   ] [CONNECTION] fd=27 connection established: peer=127.0.0.1:49878
+2023-03-12 09:52:50,522 [INFO   ] [CONTROLLER] market open
+2023-03-12 10:07:46,988 [INFO   ] [MARKET_EVENTS] reader thread complete after processing 461484 market events
+2023-03-12 10:07:50,812 [INFO   ] [TIMER] shutting down the match: time=900.254746 reason='match complete'
+2023-03-12 10:07:50,812 [INFO   ] [COMPETITOR] 'TraderOne' closing execution channel at time=900.254746
+2023-03-12 10:07:50,813 [INFO   ] [CONNECTION] fd=26 connection lost
+2023-03-12 10:07:50,813 [INFO   ] [SCORE_BOARD] writer thread complete after processing 3602 score records
+2023-03-12 10:07:50,813 [INFO   ] [MATCH_EVENTS] writer thread complete after processing 465450 match events
+2023-03-12 10:07:50,813 [INFO   ] [APP] closing event loop
