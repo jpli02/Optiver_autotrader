@@ -100,6 +100,8 @@ class AutoTrader(BaseAutoTrader):
             self.ETFbidPrices = bid_prices
             self.ETFbidVolumes = bid_volumes
 
+            if self.FUTaskPrices == None or self.FUTbidPrices == None: return
+
             new_bid_price = self.FUTaskPrices[0] if self.FUTaskPrices[0] < bid_prices[0] and self.FUTaskPrices[0] != 0 else 0
             new_ask_price = self.FUTbidPrices[0] if self.FUTbidPrices[0] > ask_prices[0] and self.FUTbidPrices[0] != 0 else 0
 
