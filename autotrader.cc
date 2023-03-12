@@ -114,7 +114,7 @@ void AutoTrader::OrderBookMessageHandler(Instrument instrument,
         }
 
            
-        if (mAskId == 0 && newAskPrice != 0 && FPosition > -POSITION_LIMIT) //&& newAskPrice > bidPrices[0]
+        if (mAskId == 0 && newAskPrice != 0 && FPosition > -POSITION_LIMIT + LOT_SIZE) //&& newAskPrice > bidPrices[0]
         {
             mAskId = mNextMessageId++;
             mAskPrice = newAskPrice;
@@ -122,7 +122,7 @@ void AutoTrader::OrderBookMessageHandler(Instrument instrument,
             mAsks.emplace(mAskId);
             FPosition -= LOT_SIZE;
         }
-        if (mBidId == 0 && newBidPrice != 0 && FPosition < POSITION_LIMIT) //&& newBidPrice  < askPrices[0]
+        if (mBidId == 0 && newBidPrice != 0 && FPosition < POSITION_LIMIT - LOT_SIZE) //&& newBidPrice  < askPrices[0]
         {
             mBidId = mNextMessageId++;
             mBidPrice = newBidPrice;
