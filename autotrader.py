@@ -46,17 +46,17 @@ class AutoTrader(BaseAutoTrader):
         self.order_ids = itertools.count(1)
         self.bids = set()
         self.asks = set()
-        self.ask_id = self.ask_price = self.bid_id = self.bid_price = self.position = 0
+        self.ask_id = self.ask_price = self.bid_id = self.bid_price = self.e_position = self.f_position = 0
 
         self.ETFaskPrices = None
         self.ETFaskVolumes = None
         self.ETFbidPrices = None
         self.ETFbidVolumes = None
 
-        self.FaskPrices = None
-        self.FaskVolumes = None
-        self.FbidPrices = None
-        self.FbidVolumes = None
+        self.FUTaskPrices = None
+        self.FUTaskVolumes = None
+        self.FUTbidPrices = None
+        self.FUTbidVolumes = None
 
     def on_error_message(self, client_order_id: int, error_message: bytes) -> None:
         """Called when the exchange detects an error.
@@ -77,6 +77,10 @@ class AutoTrader(BaseAutoTrader):
         """
         self.logger.info("received hedge filled for order %d with average price %d and volume %d", client_order_id,
                          price, volume)
+        if client_order_id in self.bids:
+            self.e_position += volume
+        elif client_order_id in self.asks:
+            self.e_position -= volume
 
     def on_order_book_update_message(self, instrument: int, sequence_number: int, ask_prices: List[int],
                                      ask_volumes: List[int], bid_prices: List[int], bid_volumes: List[int]) -> None:
@@ -96,16 +100,36 @@ class AutoTrader(BaseAutoTrader):
             self.ETFbidPrices = bid_prices
             self.ETFbidVolumes = bid_volumes
 
+            new_bid_price = self.FUTaskPrices[0] if self.FUTaskPrices[0] < bid_prices[0] and self.FUTaskPrices[0] != 0 else 0
+            new_ask_price = self.FUTbidPrices[0] if self.FUTbidPrices[0] > ask_prices[0] and self.FUTbidPrices[0] != 0 else 0
+
+            if self.f_position>0: # TODO: assume e <0
+                newid = next(self.order_ids)
+                if abs(self.e_position) < abs(self.f_position) and new_ask_price!=0:
+                    self.send_hedge_order(newid, Side.ASK, MIN_BID_NEAREST_TICK, abs(self.f_position) - abs(self.e_position))
+                    self.asks.add(newid)
+                elif abs(self.e_position) > abs(self.f_position) and new_bid_price!=0:
+                    self.send_hedge_order(newid, Side.BID, MAX_ASK_NEAREST_TICK, abs(self.e_position) - abs(self.f_position))
+                    self.bids.add(newid)
+
+            elif self.f_position<0:
+                newid = next(self.order_ids)
+                if abs(self.e_position) < abs(self.f_position) and new_bid_price!=0:
+                    self.send_hedge_order(newid, Side.BID, MAX_ASK_NEAREST_TICK, abs(self.f_position) - abs(self.e_position))
+                    self.bids.add(newid)
+                elif abs(self.e_position) > abs(self.f_position) and new_ask_price!=0:
+                    self.send_hedge_order(newid, Side.ASK, MIN_BID_NEAREST_TICK, abs(self.e_position) - abs(self.f_position))
+                    self.asks.add(newid)
+
         
         elif instrument == Instrument.FUTURE:
-            self.FaskPrices = ask_prices
-            self.FaskVolumes = ask_volumes
-            self.FbidPrices = bid_prices
-            self.FbidVolumes = bid_volumes
+            self.FUTaskPrices = ask_prices
+            self.FUTaskVolumes = ask_volumes
+            self.FUTbidPrices = bid_prices
+            self.FUTbidVolumes = bid_volumes
 
-            price_adjustment = - (self.position // LOT_SIZE) * TICK_SIZE_IN_CENTS
-            if self.ETFaskPrices == None or self.ETFbidPrices == None:
-                return
+            if self.ETFaskPrices == None or self.ETFbidPrices == None: return
+
             new_bid_price = self.ETFaskPrices[0] if self.ETFaskPrices[0] < bid_prices[0] and self.ETFaskPrices[0] != 0 else 0
             new_ask_price = self.ETFbidPrices[0] if self.ETFbidPrices[0] > ask_prices[0] and self.ETFbidPrices[0] != 0 else 0
 
@@ -117,23 +141,22 @@ class AutoTrader(BaseAutoTrader):
                 self.send_cancel_order(self.ask_id)
                 self.ask_id = 0
 
-            if self.bid_id == 0 and new_bid_price != 0 and self.position < POSITION_LIMIT:
+            if self.bid_id == 0 and new_bid_price != 0 and self.f_position < POSITION_LIMIT - LOT_SIZE:
                 print("bid price is :", new_bid_price)
+                self.bid_id = next(self.order_ids)
+                self.bid_price = new_bid_price
+                self.send_insert_order(self.bid_id, Side.BUY, new_bid_price, LOT_SIZE, Lifespan.FILL_AND_KILL)
+                self.bids.add(self.bid_id)
 
-                if (self.ETFaskPrices != None):
-                    self.bid_id = next(self.order_ids)
-                    self.bid_price = new_bid_price
-                    self.send_insert_order(self.bid_id, Side.BUY, new_bid_price, LOT_SIZE, Lifespan.FILL_AND_KILL)
-                    self.bids.add(self.bid_id)
-
-            print("====",self.ask_id, new_ask_price , self.position)
-            if self.ask_id == 0 and new_ask_price != 0 and self.position > -POSITION_LIMIT:
+            # print("====",self.ask_id, new_ask_price , self.f_position)
+            if self.ask_id == 0 and new_ask_price != 0 and self.f_position > -POSITION_LIMIT + LOT_SIZE:
                 print("ask price is :", new_ask_price)
-                if (self.ETFbidPrices != None):
-                    self.ask_id = next(self.order_ids)
-                    self.ask_price = new_ask_price
-                    self.send_insert_order(self.ask_id, Side.SELL, new_ask_price, LOT_SIZE, Lifespan.FILL_AND_KILL)
-                    self.asks.add(self.ask_id)
+                self.ask_id = next(self.order_ids)
+                self.ask_price = new_ask_price
+                self.send_insert_order(self.ask_id, Side.SELL, new_ask_price, LOT_SIZE, Lifespan.FILL_AND_KILL)
+                self.asks.add(self.ask_id)
+
+
 
     def on_order_filled_message(self, client_order_id: int, price: int, volume: int) -> None:
         """Called when one of your orders is filled, partially or fully.
@@ -145,11 +168,9 @@ class AutoTrader(BaseAutoTrader):
         self.logger.info("received order filled for order %d with price %d and volume %d", client_order_id,
                          price, volume)
         if client_order_id in self.bids:
-            self.position += volume
-            self.send_hedge_order(next(self.order_ids), Side.ASK, MIN_BID_NEAREST_TICK, volume)
+            self.f_position += volume
         elif client_order_id in self.asks:
-            self.position -= volume
-            self.send_hedge_order(next(self.order_ids), Side.BID, MAX_ASK_NEAREST_TICK, volume)
+            self.f_position -= volume
 
     def on_order_status_message(self, client_order_id: int, fill_volume: int, remaining_volume: int,
                                 fees: int) -> None:
