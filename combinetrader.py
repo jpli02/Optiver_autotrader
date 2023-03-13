@@ -88,7 +88,7 @@ class AutoTrader(BaseAutoTrader):
             if client_order_id not in self.to_hedge:
                 self.e_position -= volume
 
-        self.to_hedge.discard(client_order_id)
+        # self.to_hedge.discard(client_order_id)
 
     def on_order_book_update_message(self, instrument: int, sequence_number: int, ask_prices: List[int],
                                      ask_volumes: List[int], bid_prices: List[int], bid_volumes: List[int]) -> None:
@@ -115,20 +115,20 @@ class AutoTrader(BaseAutoTrader):
 
             if self.f_position>0: # TODO: assume e <0
                 newid = next(self.order_ids)
-                if abs(self.e_position) < abs(self.f_position) and new_ask_price!=0:
-                    self.send_hedge_order(newid, Side.ASK, MIN_BID_NEAREST_TICK, abs(self.f_position) - abs(self.e_position))
+                if -self.f_position < self.e_position and new_ask_price!=0:
+                    self.send_hedge_order(newid, Side.ASK, MIN_BID_NEAREST_TICK, abs(self.e_position + self.f_position))
                     self.asks.add(newid)
-                elif abs(self.e_position) > abs(self.f_position) and new_bid_price!=0:
-                    self.send_hedge_order(newid, Side.BID, MAX_ASK_NEAREST_TICK, abs(self.e_position) - abs(self.f_position))
+                elif self.e_position < -self.f_position and new_bid_price!=0:
+                    self.send_hedge_order(newid, Side.BID, MAX_ASK_NEAREST_TICK, abs(self.e_position + self.f_position))
                     self.bids.add(newid)
 
             elif self.f_position<0:
                 newid = next(self.order_ids)
-                if abs(self.e_position) < abs(self.f_position) and new_bid_price!=0:
-                    self.send_hedge_order(newid, Side.BID, MAX_ASK_NEAREST_TICK, abs(self.f_position) - abs(self.e_position))
+                if self.e_position < - self.f_position and new_bid_price!=0:
+                    self.send_hedge_order(newid, Side.BID, MAX_ASK_NEAREST_TICK, abs(self.e_position + self.f_position))
                     self.bids.add(newid)
-                elif abs(self.e_position) > abs(self.f_position) and new_ask_price!=0:
-                    self.send_hedge_order(newid, Side.ASK, MIN_BID_NEAREST_TICK, abs(self.e_position) - abs(self.f_position))
+                elif -self.f_position < self.e_position and new_ask_price!=0:
+                    self.send_hedge_order(newid, Side.ASK, MIN_BID_NEAREST_TICK, abs(self.e_position + self.f_position))
                     self.asks.add(newid)
 
         
@@ -138,31 +138,38 @@ class AutoTrader(BaseAutoTrader):
             self.FUTbidPrices = bid_prices
             self.FUTbidVolumes = bid_volumes
 
+            ### Minus One
             price_adjustment = - (self.position // LOT_SIZE) * TICK_SIZE_IN_CENTS
             new_bid_price = bid_prices[-2] + price_adjustment if bid_prices[0] != 0 else 0
             new_ask_price = ask_prices[-2] + price_adjustment if ask_prices[0] != 0 else 0
 
-            if self.bid_id2 != 0 and new_bid_price not in (self.bid_price, 0):
+            if self.bid_id2 != 0 and new_bid_price not in (self.bid_price2, 0):
                 self.send_cancel_order(self.bid_id2)
+                # self.bids.discard(self.bid_id2)
+                # self.to_hedge.discard(self.bid_id2)
                 self.bid_id2 = 0
-            if self.ask_id2 != 0 and new_ask_price not in (self.ask_price, 0):
+            if self.ask_id2 != 0 and new_ask_price not in (self.ask_pric2, 0):
                 self.send_cancel_order(self.ask_id2)
+                # self.asks.discard(self.ask_id2)
+                # self.to_hedge.discard(self.ask_id2)
                 self.ask_id2 = 0
 
             if self.bid_id2 == 0 and new_bid_price != 0 and self.position < POSITION_LIMIT - LOT_SIZE:
                 self.bid_id2 = next(self.order_ids)
-                self.bid_price = new_bid_price
+                self.bid_price2 = new_bid_price
                 self.send_insert_order(self.bid_id2, Side.BUY, new_bid_price, LOT_SIZE, Lifespan.GOOD_FOR_DAY)
                 self.bids.add(self.bid_id2)
                 self.to_hedge.add(self.bid_id2)
 
             if self.ask_id2 == 0 and new_ask_price != 0 and self.position > -POSITION_LIMIT + LOT_SIZE:
                 self.ask_id2 = next(self.order_ids)
-                self.ask_price = new_ask_price
+                self.ask_pric2 = new_ask_price
                 self.send_insert_order(self.ask_id2, Side.SELL, new_ask_price, LOT_SIZE, Lifespan.GOOD_FOR_DAY)
                 self.asks.add(self.ask_id2)
-                self.to_hedge.add(self.bid_id2)
+                self.to_hedge.add(self.ask_id2)
 
+
+            ### Dynamic hedge
 
             if self.ETFaskPrices == None or self.ETFbidPrices == None: return
 
@@ -184,7 +191,6 @@ class AutoTrader(BaseAutoTrader):
                 self.send_insert_order(self.bid_id, Side.BUY, new_bid_price, LOT_SIZE, Lifespan.FILL_AND_KILL)
                 self.bids.add(self.bid_id)
 
-            # print("====",self.ask_id, new_ask_price , self.f_position)
             if self.ask_id == 0 and new_ask_price != 0 and self.f_position > -POSITION_LIMIT + 4 * LOT_SIZE and self.position > -POSITION_LIMIT + 2 * LOT_SIZE:
                 print("ask price is : ", new_ask_price, "f_position is : ", self.f_position, "e_position is : ", self.e_position, "all pos is : ", self.position)
                 self.ask_id = next(self.order_ids)
@@ -215,7 +221,10 @@ class AutoTrader(BaseAutoTrader):
                 self.send_hedge_order(next(self.order_ids), Side.BID, MAX_ASK_NEAREST_TICK, volume)
             else:
                 self.f_position -= volume
-        print("all pos is : ", self.position)
+        else:
+            print("!!! unidentifiedorder",client_order_id)
+                
+        print("==== ", "f_position is : ", self.f_position, "e_position is : ", self.e_position, "all pos is : ", self.position)
 
     def on_order_status_message(self, client_order_id: int, fill_volume: int, remaining_volume: int,
                                 fees: int) -> None:
